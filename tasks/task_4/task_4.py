@@ -1,6 +1,7 @@
-# embedding_client.py
-
+import os
 from langchain_google_vertexai import VertexAIEmbeddings
+from google.cloud import aiplatform
+
 
 class EmbeddingClient:
     """
@@ -28,41 +29,33 @@ class EmbeddingClient:
 
     Note: The 'embed_query' method has been provided for you. Focus on correctly initializing the class.
     """
-    
-    def __init__(self, model_name, project, location):
-        # Initialize the VertexAIEmbeddings client with the given parameters
-        # Read about the VertexAIEmbeddings wrapper from Langchain here
-        # https://python.langchain.com/docs/integrations/text_embedding/google_generative_ai
-        self.client = VertexAIEmbeddings(
-            #### YOUR CODE HERE ####
-        )
-        
-    def embed_query(self, query):
-        """
-        Uses the embedding client to retrieve embeddings for the given query.
 
-        :param query: The text query to embed.
-        :return: The embeddings for the query or None if the operation fails.
-        """
+    def __init__(self, model_name, project, location):
+        # 设置环境变量指向服务账户密钥文件路径
+        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/Users/a1/Documents/Project/radicalAI/mission-quizify/application_key.json"
+
+        # 初始化 VertexAIEmbeddings 客户端
+        self.client = VertexAIEmbeddings(
+            model=model_name,
+            project=project,
+            location=location
+        )
+
+    def embed_query(self, query):
         vectors = self.client.embed_query(query)
         return vectors
-    
-    def embed_documents(self, documents):
-        """
-        Retrieve embeddings for multiple documents.
 
-        :param documents: A list of text documents to embed.
-        :return: A list of embeddings for the given documents.
-        """
+    def embed_documents(self, documents):
         try:
             return self.client.embed_documents(documents)
         except AttributeError:
             print("Method embed_documents not defined for the client.")
             return None
 
+
 if __name__ == "__main__":
     model_name = "textembedding-gecko@003"
-    project = "YOUR PROJECT ID HERE"
+    project = "projectjune11"
     location = "us-central1"
 
     embedding_client = EmbeddingClient(model_name, project, location)
